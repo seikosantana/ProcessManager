@@ -1,0 +1,7 @@
+C:\Users\Seiko Santana\source\repos\OpenSourceProcessManager\prm\bin\Debug\prm.exe
+C:\Users\Seiko Santana\source\repos\OpenSourceProcessManager\prm\bin\Debug\prm.pdb
+C:\Users\Seiko Santana\source\repos\OpenSourceProcessManager\prm\obj\Debug\prm.csprojAssemblyReference.cache
+C:\Users\Seiko Santana\source\repos\OpenSourceProcessManager\prm\obj\Debug\prm.csproj.CoreCompileInputs.cache
+C:\Users\Seiko Santana\source\repos\OpenSourceProcessManager\prm\obj\Debug\prm.exe
+C:\Users\Seiko Santana\source\repos\OpenSourceProcessManager\prm\obj\Debug\prm.pdb
+C:\Users\Seiko Santana\source\repos\OpenSourceProcessManager\prm\bin\Debug\prm.exe.config
