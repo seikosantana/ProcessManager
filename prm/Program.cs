@@ -83,8 +83,8 @@ namespace prm
             {
                 do
                 {
-                    loop = root();
-                } while (loop); 
+                    loop = Root();
+                } while (loop);
             }
             else
             {
@@ -98,14 +98,14 @@ namespace prm
             }
         }
 
-        static bool root()
+        static bool Root()
         {
             Prompt("\r\nPRM");
             string cmd = GetLine();
             ProcessCommand(cmd);
             return true;
         }
-        
+
         static void ListProcesses(String namecategory = "")
         {
             Process[] processes = Process.GetProcesses();
@@ -118,7 +118,7 @@ namespace prm
             Console.WriteLine($"{Format("| Name", maxlength + 4)} | {Format("ID", 6)} | {Format("Description", 35)} |");
             foreach (var process in processes)
             {
-            
+
                 string desc = "";
                 try
                 {
@@ -134,7 +134,7 @@ namespace prm
                     Console.WriteLine($"| {Format(process.ProcessName, maxlength + 2)} | {Format(process.Id, 6)} | {Format(desc, 35)} |");
                 else
                     if (process.ProcessName.ToUpper().Contains(namecategory.ToUpper()) || desc.ToUpper().Contains(namecategory.ToUpper()))
-                        Console.WriteLine($"| {Format(process.ProcessName, maxlength + 2)} | {Format(process.Id, 6)} | {Format(desc, 35)} |");
+                    Console.WriteLine($"| {Format(process.ProcessName, maxlength + 2)} | {Format(process.Id, 6)} | {Format(desc, 35)} |");
             }
         }
 
@@ -177,13 +177,39 @@ namespace prm
                             break;
                         case "CLS":
                         case "CLR":
+                        case "C":
                             Console.Clear();
                             break;
                         case "EXIT":
                         case "QUIT":
                             Environment.Exit(0);
                             break;
+                        case "STATUS":
+                        case "S":
+                        case "USAGE":
+                            GetStatus();
+                            break;
+                        case "HELP":
+                        case "H":
+                            ShowHelp();
+                            break;
                         default:
+                            Prompt("Unknown command, launching as cmd command", "", true, ConsoleStyle.Warning);
+                            try
+                            {
+                                ProcessStartInfo ps = new ProcessStartInfo();
+                                ps.FileName = "cmd.exe";
+                                ps.Arguments = $"/c {cmds[0]}";
+                                ps.UseShellExecute = false;
+
+                                Process p = Process.Start(ps);
+                                p.WaitForExit();
+                            }
+                            catch (Exception)
+                            {
+
+                                throw;
+                            }
                             break;
                     }
                     break;
@@ -204,7 +230,7 @@ namespace prm
                                 if (processes.Length == 0)
                                     Prompt($"Process \"{cmds[1]}\" not found", "", true, ConsoleStyle.Error);
                                 else
-                                   LocateProcess(processes[0], cmds[0].ToUpper() == "CMD");
+                                    LocateProcess(processes[0], cmds[0].ToUpper() == "CMD");
                             }
                             break;
                         case "LIST":
@@ -251,7 +277,7 @@ namespace prm
                         case "SUDO":
                             ProcessStartInfo ps = new ProcessStartInfo();
                             ps.FileName = cmds[1];
-                            ps.UseShellExecute = false;
+                            ps.UseShellExecute = true;
                             if (cmds[0].ToUpper() == "SUDO")
                             {
                                 ps.Verb = "runas";
@@ -281,7 +307,6 @@ namespace prm
                                     Process p = Process.Start(ps);
                                     if (cmds[0].ToUpper() != "SUDO")
                                         p.WaitForExit();
-                                    root();
                                 }
                                 catch (Exception ex_)
                                 {
@@ -305,7 +330,7 @@ namespace prm
                             string args = "";
                             for (int j = 2; j < cmds.Length; j++)
                             {
-                                args += cmds[j];
+                                args += cmds[j] + " ";
                             }
                             if (cmds[0].ToUpper() == "SUDO")
                                 ps.Verb = "runas";
@@ -337,7 +362,7 @@ namespace prm
                                     Process p = Process.Start(ps);
                                     if (cmds[0].ToUpper() != "SUDO")
                                         p.WaitForExit();
-                                    root();
+                                    Root();
                                 }
                                 catch (Exception ex_)
                                 {
@@ -352,6 +377,47 @@ namespace prm
                     break;
             }
         }
+
+        private static void ShowHelp()
+        {
+            Prompt($"AVAILABLE COMMANDS\n", "", true, ConsoleStyle.Warning);
+            Prompt("LIST [Keyword]", "", true, ConsoleStyle.Warning);
+            Prompt("Lists all running processes which has [Keyword] in its process name or description. [Keyword] is optional.\nAliases: L, R\n", "", true);
+            Prompt("KILL [ID or Name]", "", true, ConsoleStyle.Warning);
+            Prompt("Terminates all processes with specified ID or specified process name. [ID or Name] is required.\nAlias: H\n", "", true);
+            Prompt("START [Name] [Params]", "", true, ConsoleStyle.Warning);
+            Prompt("Starts process with specified [Name] as child process and passes [Params] to the new process.\nThe process will share the same console with PRM\n[Name] is required, [Params] are optional.\n", "", true);
+            Prompt("SUDO [Name] [Params]", "", true, ConsoleStyle.Warning);
+            Prompt("Starts process with specified [Name] as administrator and passes [Params] to the new process.\n[Name] is required, [Params] are optional\n", "", true);
+            Prompt("LOCATE [ID or Name]", "", true, ConsoleStyle.Warning);
+            Prompt("Starts File Explorer on the directory where process [ID or Name] is located in the disk.\n[ID or Name] is required.\n", "", true);
+            Prompt("CMD [ID or Name]", "", true, ConsoleStyle.Warning);
+            Prompt("Starts command prompt and switch to the directory where process [ID or Name] is located in the disk.\n[ID or Name] is required.\n", "", true);
+            Prompt("STATUS", "", true, ConsoleStyle.Warning);
+            Prompt("Shows resource usage.\nAliases: USAGE, S\n", "", true);
+            Prompt("HELP", "", true, ConsoleStyle.Warning);
+            Prompt("Shows this help and available commands.\nAlias: H", "", true);
+
+        }
+
+        private static void GetStatus()
+        {
+            var cpuUsage = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            var ramUsage = new PerformanceCounter("Memory", "Available MBytes");
+            Thread.Sleep(1000);
+            var firstCall = cpuUsage.NextValue();
+            firstCall = ramUsage.NextValue();
+            for (; ; )
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine($"{cpuUsage.NextValue():CPU Usage\t0.00}");
+                Console.WriteLine($"{ramUsage.NextValue():RAM\t0.00 MB available}");
+            }
+
+            Console.Read();
+            //Prompt($"{PerfC.NextValue() * 100:0.##%}");
+        }
+
         static void LocateProcess(Process p, bool useCMD = false)
         {
             string path = "";
