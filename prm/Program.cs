@@ -58,8 +58,6 @@ namespace prm
         static void Main(string[] args)
         {
             WorkDir = Environment.CurrentDirectory;
-            //Console.TreatControlCAsInput = true;
-            Console.CancelKeyPress += StopUpdate;
             Console.Title = "Command Line Process Manager 1.1";
             Prompt("Process Manager\r\nCommand Line Task Manager v1.1", "", true);
             if (args.Length == 0)
@@ -68,6 +66,7 @@ namespace prm
                 {
                     loop = Root();
                 } while (loop);
+
             }
             else
             {
@@ -78,7 +77,9 @@ namespace prm
                 }
                 cmds = cmds.Trim();
                 ProcessCommand(cmds);
+                
             }
+            Console.ResetColor();
         }
 
         private static void StopUpdate(object sender, ConsoleCancelEventArgs e)
@@ -176,13 +177,13 @@ namespace prm
                             break;
                         case "EXIT":
                         case "QUIT":
+                            Console.ResetColor();
                             Environment.Exit(0);
                             break;
                         case "STATUS":
                         case "S":
                         case "USAGE":
                             Task.Run(GetStatus);
-                            
                             break;
                         case "HELP":
                         case "H":
@@ -291,12 +292,12 @@ namespace prm
                             if (cmds[0].ToUpper() == "SUDO")
                             {
                                 ps.Verb = "runas";
-                                ps.UseShellExecute = true;
+                                //ps.UseShellExecute = true;
                             }
                             else
                             {
                                 ps.Verb = "";
-                                ps.UseShellExecute = false;
+                                //ps.UseShellExecute = false;
                             }
                             try
                             {
@@ -371,7 +372,7 @@ namespace prm
                         case "START":
                         case "SUDO":
                         ProcessStartInfo ps = new ProcessStartInfo();
-                            ps.UseShellExecute = false;
+                            ps.UseShellExecute = true;
                             ps.WorkingDirectory = Directory.GetCurrentDirectory();
                             string args = "";
                             for (int j = 2; j < cmds.Length; j++)
@@ -482,7 +483,7 @@ namespace prm
             Prompt("LIST [Keyword]", "", true, ConsoleStyle.Warning);
             Prompt("Lists all running processes which has [Keyword] in its process name or description. [Keyword] is optional.\nAliases: L, R\n", "", true);
             Prompt("KILL [ID or Name]", "", true, ConsoleStyle.Warning);
-            Prompt("Terminates all processes with specified ID or specified process name. [ID or Name] is required.\nAlias: H\n", "", true);
+            Prompt("Terminates all processes with specified ID or specified process name. [ID or Name] is required.\nAlias: K\n", "", true);
             Prompt("START [{Name and Params} or {Shell Command}]", "", true, ConsoleStyle.Warning);
             Prompt("Starts process with specified [Name] as child process and passes [Params] to the new process.\nOR executes the [Shell Command] if specified.\nThe process will share the same console with PRM\n[Name] is required, [Params] are optional.\n", "", true);
             Prompt("SUDO [{Name and Params} or {Shell Command}]", "", true, ConsoleStyle.Warning);
@@ -494,9 +495,11 @@ namespace prm
             Prompt("STATUS", "", true, ConsoleStyle.Warning);
             Prompt("Shows resource usage.\nAliases: USAGE, S\n", "", true);
             Prompt("STOP", "", true, ConsoleStyle.Warning);
-            Prompt("Stop showing resource usage.\nHotkey: Ctrl + C\n", "", true);
+            Prompt("Stop showing resource usage.\n", "", true);
             Prompt("HELP", "", true, ConsoleStyle.Warning);
             Prompt("Shows this help and available commands.\nAlias: H\n", "", true);
+            Prompt("EXIT", "", true, ConsoleStyle.Warning);
+            Prompt("Exits PRM.\nAlias: QUIT, HOTKEY: Ctrl + C\n", "", true);
             Prompt("CONTR", "", true, ConsoleStyle.Warning);
             Prompt("Opens github page on https://github.com/seikosantana/process-manager", "", true);
         }
