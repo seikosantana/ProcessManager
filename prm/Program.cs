@@ -14,6 +14,9 @@ namespace prm
 {
     static class Program
     {
+        static bool isListing = false;
+        static bool loopUsage = false;
+        static int LastX, LastY;
         static string WorkDir = "";
         enum ConsoleStyle
         {
@@ -55,8 +58,10 @@ namespace prm
         static void Main(string[] args)
         {
             WorkDir = Environment.CurrentDirectory;
-            Console.Title = "Command Line Process Manager 1.0";
-            Prompt("Process Manager\r\nCommand Line Task Manager v1.0, Seiko Santana", "", true);
+            //Console.TreatControlCAsInput = true;
+            Console.CancelKeyPress += StopUpdate;
+            Console.Title = "Command Line Process Manager 1.1";
+            Prompt("Process Manager\r\nCommand Line Task Manager v1.1", "", true);
             if (args.Length == 0)
             {
                 do
@@ -76,6 +81,14 @@ namespace prm
             }
         }
 
+        private static void StopUpdate(object sender, ConsoleCancelEventArgs e)
+        {
+            loopUsage = false;
+            Root();
+        }
+
+
+
         static bool Root()
         {
             Prompt("\r\nPRM");
@@ -87,6 +100,7 @@ namespace prm
 
         static void ListProcesses(String namecategory = "")
         {
+            isListing = true;
             Process[] processes = Process.GetProcesses();
             int maxlength = 0;
             foreach (var process in processes)
@@ -115,6 +129,7 @@ namespace prm
                     if (process.ProcessName.ToUpper().Contains(namecategory.ToUpper()) || desc.ToUpper().Contains(namecategory.ToUpper()))
                     Console.WriteLine($"| {Format(process.ProcessName, maxlength + 2)} | {Format(process.Id, 6)} | {Format(desc, 35)} |");
             }
+            isListing = false;
         }
 
         static string Format(object content, int length)
@@ -166,7 +181,8 @@ namespace prm
                         case "STATUS":
                         case "S":
                         case "USAGE":
-                            GetStatus();
+                            Task.Run(GetStatus);
+                            
                             break;
                         case "HELP":
                         case "H":
@@ -184,6 +200,9 @@ namespace prm
                         case "START":
                         case "SUDO":
                             Prompt("Unspecified shell command or file path or program name. Refer to help for command list.", "", true, ConsoleStyle.Error);
+                            break;
+                        case "STOP":
+                            loopUsage = false;
                             break;
                         default:
                             Prompt("Launching as shell command", "", true, ConsoleStyle.Warning);
@@ -372,7 +391,7 @@ namespace prm
                             try
                             {
                                 Process p = Process.Start(ps);
-                                if (cmds[0].ToUpper() != "SUDO") ;
+                                if (cmds[0].ToUpper() != "SUDO");
                                     p.WaitForExit();
                             }
                             catch (Exception ex)
@@ -420,8 +439,8 @@ namespace prm
                             try
                             {
                                 Process p = Process.Start(ps);
-                                if (cmds[0].ToUpper() != "SUDO") ;
-                                p.WaitForExit();
+                                if (cmds[0].ToUpper() != "SUDO");
+                                    p.WaitForExit();
                             }
                             catch (Exception ex)
                             {
@@ -474,6 +493,8 @@ namespace prm
             Prompt("Starts command prompt and switch to the directory where process [ID or Name] is located in the disk.\n[ID or Name] is required.\n", "", true);
             Prompt("STATUS", "", true, ConsoleStyle.Warning);
             Prompt("Shows resource usage.\nAliases: USAGE, S\n", "", true);
+            Prompt("STOP", "", true, ConsoleStyle.Warning);
+            Prompt("Stop showing resource usage.\nHotkey: Ctrl + C\n", "", true);
             Prompt("HELP", "", true, ConsoleStyle.Warning);
             Prompt("Shows this help and available commands.\nAlias: H\n", "", true);
             Prompt("CONTR", "", true, ConsoleStyle.Warning);
@@ -535,15 +556,35 @@ namespace prm
         private static void GetStatus()
         {
             PerformanceCounter counter = new PerformanceCounter();
-            while (true)
+            loopUsage = true;
+            while (loopUsage)
             {
-                string CPUTime = $"{Format("CPU Time", 18)}: {GetCPUTime(counter):0}%";
-                string RAMInUse = $"{Format("RAM in Use", 18)}: {GetRAMCommited(counter):0}%";
-                string RAMFree = $"{Format("Available", 18)}: {GetRAMFree(counter):0} MB";
-                string DiskAct = $"{Format("Disk Time", 18)}: {GetDiskActivity(counter):0}%";
-                string NetworkAct = $"{Format("Network Activity", 18)}: {GetNetworkActivity(counter):0} bytes";
-                Prompt(string.Join("\n", CPUTime, RAMInUse, RAMFree, DiskAct, NetworkAct), "", true);
+                if (!isListing)
+                {
+                    string CPUTime = $"{Format("CPU Time", 18)}: {GetCPUTime(counter):0}%";
+                    string RAMInUse = $"{Format("RAM in Use", 18)}: {GetRAMCommited(counter):0}%";
+                    string RAMFree = $"{Format("Available", 18)}: {GetRAMFree(counter):0} MB";
+                    string DiskAct = $"{Format("Disk Time", 18)}: {GetDiskActivity(counter):0}%";
+                    string NetworkAct = $"{Format("Network Activity", 18)}: {GetNetworkActivity(counter):0} bytes";
+                    LastX = Console.CursorLeft;
+                    LastY = Console.CursorTop;
+                    Console.CursorLeft = Console.WindowWidth - 30;
+                    Prompt(Format(CPUTime, 29), "", true);
+                    Console.CursorLeft = Console.WindowWidth - 30;
+                    Prompt(Format(RAMInUse, 29), "", true);
+                    Console.CursorLeft = Console.WindowWidth - 30;
+                    Prompt(Format(RAMFree, 29), "", true);
+                    Console.CursorLeft = Console.WindowWidth - 30;
+                    Prompt(Format(DiskAct, 29), "", true);
+                    Console.CursorLeft = Console.WindowWidth - 30;
+                    Prompt(Format(NetworkAct, 29), "", true);
+                    Console.CursorLeft = LastX;
+                    Console.CursorTop = LastY;
+                }
+                else
+                    continue;
             }
+            counter.Dispose();
         }
 
         static void LocateProcess(Process p, bool useCMD = false)

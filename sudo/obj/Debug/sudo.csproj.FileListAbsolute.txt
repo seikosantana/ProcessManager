@@ -1,0 +1,6 @@
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\sudo\bin\Debug\sudo.exe.config
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\sudo\bin\Debug\sudo.exe
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\sudo\bin\Debug\sudo.pdb
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\sudo\obj\Debug\sudo.csprojAssemblyReference.cache
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\sudo\obj\Debug\sudo.exe
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\sudo\obj\Debug\sudo.pdb
