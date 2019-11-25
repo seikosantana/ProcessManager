@@ -14,6 +14,7 @@ namespace prm
 {
     static class Program
     {
+        static string WorkDir = "";
         enum ConsoleStyle
         {
             Normal, Error, Warning, Success, Input
@@ -49,34 +50,11 @@ namespace prm
         {
             return Console.ReadLine();
         }
-        static char GetChar(bool hide = false)
-        {
-            var key = Console.ReadKey(hide);
-            return key.KeyChar;
-        }
 
-        static char GetChar(char[] among, bool hide = false)
-        {
-            char result = ' ';
-            while (true)
-            {
-                var ch = Console.ReadKey(!hide).KeyChar;
-                foreach (var chars in among)
-                {
-                    if (char.ToUpper(ch) == char.ToUpper(chars))
-                    {
-                        Console.Write(ch);
-                        result = ch;
-                        break;
-                    }
-                }
-                if (result != ' ') break;
-            }
-            return result;
-        }
         static bool loop;
         static void Main(string[] args)
         {
+            WorkDir = Environment.CurrentDirectory;
             Console.Title = "Command Line Process Manager 1.0";
             Prompt("Process Manager\r\nCommand Line Task Manager v1.0, Seiko Santana", "", true);
             if (args.Length == 0)
@@ -101,8 +79,9 @@ namespace prm
         static bool Root()
         {
             Prompt("\r\nPRM");
-            string cmd = GetLine();
-            ProcessCommand(cmd);
+            string cmd = GetLine().Trim();
+            if (cmd != string.Empty)
+                ProcessCommand(cmd);
             return true;
         }
 
@@ -193,22 +172,33 @@ namespace prm
                         case "H":
                             ShowHelp();
                             break;
+                        case "CONTR":
+                            Process.Start("https://github.com/seikosantana/process-manager");
+                            break;
+                        case "KILL":
+                        case "K":
+                        case "LOCATE":
+                        case "CMD":
+                            Prompt("Unspecified ID or process name. Refer to help for command list.", "", true, ConsoleStyle.Error);
+                            break;
+                        case "START":
+                        case "SUDO":
+                            Prompt("Unspecified shell command or file path or program name. Refer to help for command list.", "", true, ConsoleStyle.Error);
+                            break;
                         default:
-                            Prompt("Unknown command, launching as cmd command", "", true, ConsoleStyle.Warning);
+                            Prompt("Launching as shell command", "", true, ConsoleStyle.Warning);
                             try
                             {
                                 ProcessStartInfo ps = new ProcessStartInfo();
                                 ps.FileName = "cmd.exe";
                                 ps.Arguments = $"/c {cmds[0]}";
                                 ps.UseShellExecute = false;
-
                                 Process p = Process.Start(ps);
                                 p.WaitForExit();
                             }
                             catch (Exception)
                             {
-
-                                throw;
+                            
                             }
                             break;
                     }
@@ -278,31 +268,36 @@ namespace prm
                             ProcessStartInfo ps = new ProcessStartInfo();
                             ps.FileName = cmds[1];
                             ps.UseShellExecute = true;
+                            
                             if (cmds[0].ToUpper() == "SUDO")
                             {
                                 ps.Verb = "runas";
                                 ps.UseShellExecute = true;
                             }
                             else
+                            {
                                 ps.Verb = "";
+                                ps.UseShellExecute = false;
+                            }
                             try
                             {
-                                Process.Start(ps);
+                                Process p = Process.Start(ps);
+                                if (cmds[0].ToUpper() == "START")
+                                    p.WaitForExit();
                             }
                             catch (Exception ex)
                             {
                                 Prompt($"Launch failed. {ex.Message}", "", true, ConsoleStyle.Error);
-                                Prompt("Launching as cmd command.", "", true, ConsoleStyle.Warning);
+                                Prompt("Launching as shell command.", "", true, ConsoleStyle.Warning);
                                 try
                                 {
                                     ps.FileName = "cmd.exe";
                                     if (cmds[0].ToUpper() == "SUDO")
-                                        ps.Arguments = "/k " + cmds[1];
+                                        ps.Arguments = $"/c {Directory.GetDirectoryRoot(WorkDir).Replace("\\", "")}&cd {WorkDir}&{cmds[1]}";
                                     else
                                     {
                                         ps.Arguments = "/c " + cmds[1];
                                         ps.UseShellExecute = false;
-                                        ps.RedirectStandardOutput = true;
                                     }
                                     Process p = Process.Start(ps);
                                     if (cmds[0].ToUpper() != "SUDO")
@@ -310,12 +305,44 @@ namespace prm
                                 }
                                 catch (Exception ex_)
                                 {
-                                    Prompt("Cannot launch as cmd command. " + ex_.Message, "", true, ConsoleStyle.Error);
+                                    Prompt("Cannot launch as shell command. " + ex_.Message, "", true, ConsoleStyle.Error);
                                 }
                             }
                             break;
 
                         default:
+                            ps = new ProcessStartInfo();
+                            ps.FileName = cmds[0];
+                            ps.UseShellExecute = true;
+                            ps.Arguments = cmds[1];
+                            try
+                            {
+                                Process p = Process.Start(ps);
+                                p.WaitForExit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Prompt($"Launch failed. {ex.Message}", "", true, ConsoleStyle.Error);
+                                Prompt("Launching as shell command.", "", true, ConsoleStyle.Warning);
+                                try
+                                {
+                                    ps.FileName = "cmd.exe";
+                                    if (cmds[0].ToUpper() == "SUDO")
+                                        ps.Arguments = $"/c {Directory.GetDirectoryRoot(WorkDir).Replace("\\", "")}&cd {WorkDir}&{cmds[1]}";
+                                    else
+                                    {
+                                        ps.Arguments = "/c " + cmds[1];
+                                        ps.UseShellExecute = false;
+                                    }
+                                    Process p = Process.Start(ps);
+                                    if (cmds[0].ToUpper() != "SUDO")
+                                        p.WaitForExit();
+                                }
+                                catch (Exception ex_)
+                                {
+                                    Prompt("Cannot launch as shell command. " + ex_.Message, "", true, ConsoleStyle.Error);
+                                }
+                            }
                             break;
                     }
                     break;
@@ -324,8 +351,8 @@ namespace prm
                     {
                         case "START":
                         case "SUDO":
-                            ProcessStartInfo ps = new ProcessStartInfo();
-                            ps.UseShellExecute = true;
+                        ProcessStartInfo ps = new ProcessStartInfo();
+                            ps.UseShellExecute = false;
                             ps.WorkingDirectory = Directory.GetCurrentDirectory();
                             string args = "";
                             for (int j = 2; j < cmds.Length; j++)
@@ -333,7 +360,10 @@ namespace prm
                                 args += cmds[j] + " ";
                             }
                             if (cmds[0].ToUpper() == "SUDO")
+                            {
+                                ps.UseShellExecute = true;
                                 ps.Verb = "runas";
+                            }
                             else
                                 ps.Verb = "";
                             args = args.Trim();
@@ -341,19 +371,22 @@ namespace prm
                             ps.Arguments = args;
                             try
                             {
-                                Process.Start(ps);
+                                Process p = Process.Start(ps);
+                                if (cmds[0].ToUpper() != "SUDO") ;
+                                    p.WaitForExit();
                             }
                             catch (Exception ex)
                             {
-                                Prompt($"Launch failed. {ex.Message}", "", true, ConsoleStyle.Error);
-                                Prompt("Launching as cmd command.", "", true, ConsoleStyle.Warning);
+                                Prompt($"Cannot find process. {ex.Message}", "", true, ConsoleStyle.Error);
+                                Prompt("Launching as shell command.", "", true, ConsoleStyle.Warning);
                                 try
                                 {
                                     args = cmds[1] + " " + args;
                                     ps.FileName = "cmd.exe";
                                     ps.WorkingDirectory = Directory.GetCurrentDirectory();
                                     if (cmds[0].ToUpper() == "SUDO")
-                                        ps.Arguments = "/k " + args;
+                                        ps.Arguments = $"/c {Directory.GetDirectoryRoot(WorkDir).Replace("\\", "")}&cd {WorkDir}&{args}";
+                                        //ps.Arguments = "/k " + args;
                                     else
                                     {
                                         ps.Arguments = "/c " + args;
@@ -366,13 +399,59 @@ namespace prm
                                 }
                                 catch (Exception ex_)
                                 {
-                                    Prompt("Cannot launch as cmd command. " + ex_.Message, "", true, ConsoleStyle.Error);
+                                    Prompt("Cannot launch as shell command. " + ex_.Message, "", true, ConsoleStyle.Error);
                                 }
-                            }
-
+                            }                            
                             break;
                         default:
+                            ps = new ProcessStartInfo();
+                            ps.UseShellExecute = false;
+                            ps.WorkingDirectory = Directory.GetCurrentDirectory();
+                            args = "";
+                            for (int j = 1; j < cmds.Length; j++)
+                            {
+                                args += cmds[j] + " ";
+                            }
+                            
+                            ps.Verb = "";
+                            args = args.Trim();
+                            ps.FileName = cmds[0];
+                            ps.Arguments = args;
+                            try
+                            {
+                                Process p = Process.Start(ps);
+                                if (cmds[0].ToUpper() != "SUDO") ;
+                                p.WaitForExit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Prompt($"Cannot find process. {ex.Message}", "", true, ConsoleStyle.Error);
+                                Prompt("Launching as shell command.", "", true, ConsoleStyle.Warning);
+                                try
+                                {
+                                    args = cmds[1] + " " + args;
+                                    ps.FileName = "cmd.exe";
+                                    ps.WorkingDirectory = Directory.GetCurrentDirectory();
+                                    if (cmds[0].ToUpper() == "SUDO")
+                                        ps.Arguments = $"/c {Directory.GetDirectoryRoot(WorkDir).Replace("\\", "")}&cd {WorkDir}&{args}";
+                                    //ps.Arguments = "/k " + args;
+                                    else
+                                    {
+                                        ps.Arguments = "/c " + args;
+                                        ps.UseShellExecute = false;
+                                    }
+                                    Process p = Process.Start(ps);
+                                    if (cmds[0].ToUpper() != "SUDO")
+                                        p.WaitForExit();
+                                    Root();
+                                }
+                                catch (Exception ex_)
+                                {
+                                    Prompt("Cannot launch as shell command. " + ex_.Message, "", true, ConsoleStyle.Error);
+                                }
+                            }
                             break;
+
                     }
                     break;
             }
@@ -385,10 +464,10 @@ namespace prm
             Prompt("Lists all running processes which has [Keyword] in its process name or description. [Keyword] is optional.\nAliases: L, R\n", "", true);
             Prompt("KILL [ID or Name]", "", true, ConsoleStyle.Warning);
             Prompt("Terminates all processes with specified ID or specified process name. [ID or Name] is required.\nAlias: H\n", "", true);
-            Prompt("START [Name] [Params]", "", true, ConsoleStyle.Warning);
-            Prompt("Starts process with specified [Name] as child process and passes [Params] to the new process.\nThe process will share the same console with PRM\n[Name] is required, [Params] are optional.\n", "", true);
-            Prompt("SUDO [Name] [Params]", "", true, ConsoleStyle.Warning);
-            Prompt("Starts process with specified [Name] as administrator and passes [Params] to the new process.\n[Name] is required, [Params] are optional\n", "", true);
+            Prompt("START [{Name and Params} or {Shell Command}]", "", true, ConsoleStyle.Warning);
+            Prompt("Starts process with specified [Name] as child process and passes [Params] to the new process.\nOR executes the [Shell Command] if specified.\nThe process will share the same console with PRM\n[Name] is required, [Params] are optional.\n", "", true);
+            Prompt("SUDO [{Name and Params} or {Shell Command}]", "", true, ConsoleStyle.Warning);
+            Prompt("Starts process with specified [Name] as administrator and passes [Params] to the new process.\nOR executes the [Shell Command] with administrator priviledge, if specified.\n`[Name] is required, [Params] are optional\n", "", true);
             Prompt("LOCATE [ID or Name]", "", true, ConsoleStyle.Warning);
             Prompt("Starts File Explorer on the directory where process [ID or Name] is located in the disk.\n[ID or Name] is required.\n", "", true);
             Prompt("CMD [ID or Name]", "", true, ConsoleStyle.Warning);
@@ -396,26 +475,75 @@ namespace prm
             Prompt("STATUS", "", true, ConsoleStyle.Warning);
             Prompt("Shows resource usage.\nAliases: USAGE, S\n", "", true);
             Prompt("HELP", "", true, ConsoleStyle.Warning);
-            Prompt("Shows this help and available commands.\nAlias: H", "", true);
+            Prompt("Shows this help and available commands.\nAlias: H\n", "", true);
+            Prompt("CONTR", "", true, ConsoleStyle.Warning);
+            Prompt("Opens github page on https://github.com/seikosantana/process-manager", "", true);
+        }
+
+        private static float GetCPUTime(PerformanceCounter Counter)
+        {
+            Counter.CategoryName = "Processor";
+            Counter.CounterName = "% Processor Time";
+            Counter.InstanceName = "_Total";
+            float res = Counter.NextValue();
+            Thread.Sleep(200);
+            return Counter.NextValue();
+        }
+
+        private static float GetRAMFree(PerformanceCounter Counter)
+        {
+            Counter.CategoryName = "Memory";
+            Counter.CounterName = "Available MBytes";
+            Counter.InstanceName = "";
+            float res = Counter.NextValue();
+            Thread.Sleep(200);
+            return Counter.NextValue();
+        }
+
+        private static float GetRAMCommited(PerformanceCounter Counter)
+        {
+            Counter.CategoryName = "Memory";
+            Counter.CounterName = "% Committed Bytes In Use";
+            Counter.InstanceName = "";
+            float res = Counter.NextValue();
+            Thread.Sleep(200);
+            return Counter.NextValue();
+        }
+
+        private static float GetDiskActivity(PerformanceCounter Counter)
+        {
+            Counter.CategoryName = "PhysicalDisk";
+            Counter.CounterName = "% Disk Time";
+            Counter.InstanceName = "_Total";
+            float res = Counter.NextValue();
+            Thread.Sleep(200);
+            return Counter.NextValue();
+        }
+
+        private static float GetNetworkActivity(PerformanceCounter Counter)
+        {
+            Counter.CategoryName = "Network Interface";
+            Counter.CounterName = "Bytes Total/sec";
+            PerformanceCounterCategory category = new PerformanceCounterCategory(Counter.CategoryName);
+            Counter.InstanceName = category.GetInstanceNames()[1];
+            float res = Counter.NextValue();
+            Thread.Sleep(200);
+            return Counter.NextValue();
 
         }
 
         private static void GetStatus()
         {
-            var cpuUsage = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-            var ramUsage = new PerformanceCounter("Memory", "Available MBytes");
-            Thread.Sleep(1000);
-            var firstCall = cpuUsage.NextValue();
-            firstCall = ramUsage.NextValue();
-            for (; ; )
+            PerformanceCounter counter = new PerformanceCounter();
+            while (true)
             {
-                Thread.Sleep(1000);
-                Console.WriteLine($"{cpuUsage.NextValue():CPU Usage\t0.00}");
-                Console.WriteLine($"{ramUsage.NextValue():RAM\t0.00 MB available}");
+                string CPUTime = $"{Format("CPU Time", 18)}: {GetCPUTime(counter):0}%";
+                string RAMInUse = $"{Format("RAM in Use", 18)}: {GetRAMCommited(counter):0}%";
+                string RAMFree = $"{Format("Available", 18)}: {GetRAMFree(counter):0} MB";
+                string DiskAct = $"{Format("Disk Time", 18)}: {GetDiskActivity(counter):0}%";
+                string NetworkAct = $"{Format("Network Activity", 18)}: {GetNetworkActivity(counter):0} bytes";
+                Prompt(string.Join("\n", CPUTime, RAMInUse, RAMFree, DiskAct, NetworkAct), "", true);
             }
-
-            Console.Read();
-            //Prompt($"{PerfC.NextValue() * 100:0.##%}");
         }
 
         static void LocateProcess(Process p, bool useCMD = false)
