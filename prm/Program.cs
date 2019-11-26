@@ -292,12 +292,10 @@ namespace prm
                             if (cmds[0].ToUpper() == "SUDO")
                             {
                                 ps.Verb = "runas";
-                                //ps.UseShellExecute = true;
                             }
                             else
                             {
                                 ps.Verb = "";
-                                //ps.UseShellExecute = false;
                             }
                             try
                             {
