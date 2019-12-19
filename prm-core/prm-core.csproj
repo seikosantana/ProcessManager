@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>prm_core</RootNamespace>
     <StartupObject>prm.Program</StartupObject>
+    <ApplicationIcon>prm-ico.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

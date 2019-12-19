@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\Seiko Santana\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Seiko Santana\\.nuget\\packages"
+    ]
+  }
+}
