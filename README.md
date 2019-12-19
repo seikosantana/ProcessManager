@@ -20,7 +20,7 @@ At this point, we can provide our own commands that can be run through shells (s
 
 By providing all those capabilities in PRM, I would say that PRM has met all minimum functionalities as a Task Manager, excluding uncommonly needed things, but also extends the shell capabilities.
 
-#Cross Platform PRM
+# Cross Platform PRM
 #### Built on top of .NET Core 3.1
 The project prm-core found in the solution is based on .NET Core. Unlike the original prm which is based on .NET Framework 4.7, prm-core is expected to be cross-platform. The cross-platform prm has been tested on WSL with Ubuntu 18.04 distro and has been running with limitations. Currently, prm-core has not been modified, and still running cmd commands instead of bash commands on Linux-64 platform.
 
