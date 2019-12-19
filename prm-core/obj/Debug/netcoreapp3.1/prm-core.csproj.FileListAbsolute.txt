@@ -1,0 +1,11 @@
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\obj\Debug\netcoreapp3.1\prm-core.csprojAssemblyReference.cache
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\obj\Debug\netcoreapp3.1\prm-core.AssemblyInfoInputs.cache
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\obj\Debug\netcoreapp3.1\prm-core.AssemblyInfo.cs
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\bin\Debug\netcoreapp3.1\prm-core.exe
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\bin\Debug\netcoreapp3.1\prm-core.deps.json
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\bin\Debug\netcoreapp3.1\prm-core.runtimeconfig.json
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\bin\Debug\netcoreapp3.1\prm-core.runtimeconfig.dev.json
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\bin\Debug\netcoreapp3.1\prm-core.dll
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\bin\Debug\netcoreapp3.1\prm-core.pdb
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\obj\Debug\netcoreapp3.1\prm-core.dll
+C:\Users\Seiko Santana\OneDrive\Projects\OpenSourceProcessManager\prm-core\obj\Debug\netcoreapp3.1\prm-core.pdb

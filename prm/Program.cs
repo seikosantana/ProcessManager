@@ -206,7 +206,7 @@ namespace prm
                             loopUsage = false;
                             break;
                         default:
-                            Prompt("Launching as shell command", "", true, ConsoleStyle.Warning);
+                            Prompt("Launching as shell command.", "", true, ConsoleStyle.Warning);
                             try
                             {
                                 ProcessStartInfo ps = new ProcessStartInfo();
@@ -300,8 +300,6 @@ namespace prm
                             try
                             {
                                 Process p = Process.Start(ps);
-                                if (cmds[0].ToUpper() == "START")
-                                    p.WaitForExit();
                             }
                             catch (Exception ex)
                             {
@@ -318,8 +316,6 @@ namespace prm
                                         ps.UseShellExecute = false;
                                     }
                                     Process p = Process.Start(ps);
-                                    if (cmds[0].ToUpper() != "SUDO")
-                                        p.WaitForExit();
                                 }
                                 catch (Exception ex_)
                                 {
@@ -336,7 +332,7 @@ namespace prm
                             try
                             {
                                 Process p = Process.Start(ps);
-                                p.WaitForExit();
+                                //p.WaitForExit();
                             }
                             catch (Exception ex)
                             {
@@ -353,8 +349,6 @@ namespace prm
                                         ps.UseShellExecute = false;
                                     }
                                     Process p = Process.Start(ps);
-                                    if (cmds[0].ToUpper() != "SUDO")
-                                        p.WaitForExit();
                                 }
                                 catch (Exception ex_)
                                 {
@@ -438,8 +432,6 @@ namespace prm
                             try
                             {
                                 Process p = Process.Start(ps);
-                                if (cmds[0].ToUpper() != "SUDO");
-                                    p.WaitForExit();
                             }
                             catch (Exception ex)
                             {
@@ -459,8 +451,6 @@ namespace prm
                                         ps.UseShellExecute = false;
                                     }
                                     Process p = Process.Start(ps);
-                                    if (cmds[0].ToUpper() != "SUDO")
-                                        p.WaitForExit();
                                     Root();
                                 }
                                 catch (Exception ex_)
@@ -469,7 +459,6 @@ namespace prm
                                 }
                             }
                             break;
-
                     }
                     break;
             }

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "prm", "prm\prm.csproj", "{C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sudo", "sudo\sudo.csproj", "{1E3D659C-8913-4C90-8209-7306BDB66194}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "prm-core", "prm-core\prm-core.csproj", "{EF9F329C-7810-423F-A3E6-277D3D223F6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{1E3D659C-8913-4C90-8209-7306BDB66194}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1E3D659C-8913-4C90-8209-7306BDB66194}.Release|x64.ActiveCfg = Release|Any CPU
 		{1E3D659C-8913-4C90-8209-7306BDB66194}.Release|x64.Build.0 = Release|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Debug|x64.Build.0 = Debug|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Release|x64.ActiveCfg = Release|Any CPU
+		{EF9F329C-7810-423F-A3E6-277D3D223F6A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
